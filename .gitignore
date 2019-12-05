@@ -123,4 +123,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-objrec/data/data/darknet_weights/yolov3.ckpt.data-00000-of-00001
+objrec/data/data/darknet_weights
+objrec/data/data/darknet_weights1
