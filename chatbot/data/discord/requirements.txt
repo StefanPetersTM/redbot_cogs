@@ -1,0 +1,6 @@
+tensorflow-gpu
+fire
+regex
+botframework-connector
+toposort
+tqdm
