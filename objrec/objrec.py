@@ -1,44 +1,29 @@
-#from redbot.core import commands
 import os
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import tensorflow as tf
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-from tensorflow.python.util import deprecation
-deprecation._PRINT_DEPRECATION_WARNINGS = False
-try:
-    from tensorflow.python.util import module_wrapper as deprecation
-except ImportError:
-    from tensorflow.python.util import deprecation_wrapper as deprecation
-deprecation._PER_MODULE_WARNING_LIMIT = 0
-
-#from numba import cuda
-import cv2
 import datetime
-#import pathlib
-
-
 from urllib.request import Request, urlopen
+
+import tensorflow as tf
+import cv2
 import discord
 from redbot.core import commands
 
 from .data import ObjectRecognition
 from .data import VideoRecognition
 
+
 class objrec(commands.Cog):
     """Process images"""
 
     def __init__(self, bot):
-        #        g1 = tf.Graph()
+        print("   Loading objrec...")
+        self.bot = bot
         g2 = tf.Graph()
-
-        #        with g1.as_default():
-        #            enc, sess1, output, context, bot_name = chat.session()
         with g2.as_default():
-            print("   Creating Tensorflow session...")
+            print("      Creating Tensorflow session...")
             self.sess2, self.boxes, self.scores, self.labels, self.input_data, self.classes, self.color_table = ObjectRecognition.session()
-            print("   Tensorflow session created.\n")
-            self.img_extensions = [".JPG", ".jpeg", ".jpg", ".jpe", ".jp2", ".png", ".bmp", ".pbm", ".pgm", ".ppm", ".tiff", ".tif"]
+            print("      Tensorflow session created.\n")
+            self.img_extensions = [".JPG", ".jpeg", ".jpg", ".jpe", ".jp2", ".png", ".bmp", ".pbm", ".pgm", ".ppm",
+                                   ".tiff", ".tif"]
             self.vid_extensions = [".mp4", ".avi", ".gif"]
 
     @commands.command()
@@ -46,27 +31,42 @@ class objrec(commands.Cog):
         """Object recognition using YOLOv3."""
         message = ctx.message
         print("\n" * 2)
-        #print("attachments:" + str(message.attachments))
 
         if message.attachments:
             print("Image sent to bot by {}: ".format(message.author) + str(message.attachments[0].filename))
             filename, extension = os.path.splitext(message.attachments[0].filename)
-            #print("File extension: " + str(extension))
             if extension in self.img_extensions:
                 req = Request(message.attachments[0].url, headers={'User-Agent': 'Mozilla/5.0'})
                 img = urlopen(req).read()
 
                 currentDT = datetime.datetime.now()
                 curr_img_path = 'D:\Discord_bot\Discord_bot_saved_images\{}'.format(
-                    str(message.author) + currentDT.strftime("_%Y-%m-%d_%H-%M.jpg"))
+                        str(message.author) + currentDT.strftime("_%Y-%m-%d_%H-%M.jpg"))
                 fhand = open(curr_img_path, 'wb')
                 fhand.write(img)
                 fhand.close()
 
-                processed_img, labels_, scores_ = ObjectRecognition.obj_rec(curr_img_path, self.sess2, self.boxes, self.scores,
-                                                                            self.labels, self.input_data, self.classes, self.color_table)
+                processed_img, labels_, scores_ = ObjectRecognition.obj_rec(curr_img_path, self.sess2, self.boxes,
+                                                                            self.scores,
+                                                                            self.labels, self.input_data, self.classes,
+                                                                            self.color_table)
 
-                await message.channel.send(content=str(labels_)+"\n"+str(scores_), file=discord.File(processed_img, 'processed_image.jpg'))
+                unique_labels = []
+                for i in labels_:
+                    if i not in unique_labels:
+                        unique_labels.append(i)
+
+                print(unique_labels)
+                print(', '.join(unique_labels))
+                await message.channel.send(content=None, file=discord.File(processed_img, 'processed_image.jpg'))
+                await message.channel.send(
+                        content="I can see that you sent me a picture containing " + ', '.join(unique_labels),
+                        delete_after=10)
+
+                received_image = self.bot.get_cog('chat')
+                print("Chatbot cog is: {}".format(received_image))
+                if received_image is not None:
+                    await received_image.rec_img(ctx, unique_labels)
 
             elif extension in self.vid_extensions:
                 req = Request(message.attachments[0].url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -74,21 +74,26 @@ class objrec(commands.Cog):
 
                 currentDT = datetime.datetime.now()
                 curr_img_path = 'D:\Discord_bot\Discord_bot_saved_images\{}'.format(
-                    str(message.author) + currentDT.strftime("_%Y-%m-%d_%H-%M-%S.mp4"))
+                        str(message.author) + currentDT.strftime("_%Y-%m-%d_%H-%M-%S.mp4"))
                 fhand = open(curr_img_path, 'wb')
                 fhand.write(img)
                 fhand.close()
 
-                processed_vid, labels_, inference_time = VideoRecognition.vid_rec(curr_img_path, self.sess2, self.boxes, self.scores,
-                                                                            self.labels, self.input_data, self.classes, self.color_table)
+                processed_vid, labels_, inference_time = VideoRecognition.vid_rec(curr_img_path, self.sess2, self.boxes,
+                                                                                  self.scores,
+                                                                                  self.labels, self.input_data,
+                                                                                  self.classes, self.color_table)
 
-                await message.channel.send(content="Average inference time: " + str(inference_time) + '\n' + str(labels_), file=discord.File(processed_vid, filename='processed_video.mp4'))
+                await message.channel.send(
+                        content="Average inference time: " + str(inference_time) + '\n' + str(labels_),
+                        file=discord.File(processed_vid, filename='processed_video.mp4'))
 
             else:
                 await message.channel.send(content=str("Unsupported file format!"))
 
         else:
-            await message.channel.send(content="No image sent! Send an image and comment '{}objrec' to see some magic.".format(ctx.prefix))
+            await message.channel.send(
+                    content="No image sent! Send an image and comment '{}objrec' to see some magic.".format(ctx.prefix))
 
     @commands.command()
     async def bug(self, message):
@@ -99,7 +104,9 @@ class objrec(commands.Cog):
     async def improve(self, message):
         """Suggest us what we can do to improve the bot"""
         await message.channel.send("Suggest us what we can improve in this form: https://forms.gle/Q4ASeARZGmqyR2Qg7")
-#    def cog_unload(self):
-#       self.sess2.close()
-        #self.bot.loop.create_task(self.session.close())
-#  __unload = cog_unload
+
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
+
+
+__unload = cog_unload

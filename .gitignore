@@ -123,7 +123,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+objrec/.idea
 objrec/data/data/darknet_weights
 objrec/data/data/darknet_weights1
 chatbot/data/774M/model.ckpt.data-00000-of-00001
+
 

@@ -1,22 +1,21 @@
 from __future__ import division, print_function
+import time
+import os
+
 import tensorflow as tf
 import numpy as np
 import cv2
-import time
-import os
 
 from .utils.misc_utils import parse_anchors, read_class_names
 from .utils.nms_utils import gpu_nms
 from .utils.plot_utils import get_color_table, plot_one_box
 from .utils.data_aug import letterbox_resize
-
 from .model1 import yolov3
 
 
 def session(anchor_path=r'D:\GithubProjects\TM\data\yolo_anchors.txt', new_size=[416, 416],
             class_name_path=r'D:\GithubProjects\TM\data\coco.names',
             restore_path=r'D:\GithubProjects\TM\data\darknet_weights\yolov3.ckpt'):
-
     # Initializing
     anchors = parse_anchors(anchor_path)
     classes = read_class_names(class_name_path)
@@ -33,13 +32,8 @@ def session(anchor_path=r'D:\GithubProjects\TM\data\yolo_anchors.txt', new_size=
 
     pred_scores = pred_confs * pred_probs
 
-    boxes, scores, labels = gpu_nms(pred_boxes, pred_scores, num_class, max_boxes=50, score_thresh=0.25, nms_thresh=0.45)
-
-    # Initializing Tensorflow session
-  #  config = tf.ConfigProto(
- #       device_count={'GPU': 0}
-#    )
-#    sess2 = tf.Session()
+    boxes, scores, labels = gpu_nms(pred_boxes, pred_scores, num_class, max_boxes=50, score_thresh=0.25,
+                                    nms_thresh=0.45)
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -48,9 +42,9 @@ def session(anchor_path=r'D:\GithubProjects\TM\data\yolo_anchors.txt', new_size=
     saver = tf.train.Saver()
     saver.restore(sess2, restore_path)
     if tf.test.gpu_device_name():
-        print('GPU found')
+        print('         GPU found')
     else:
-        print("No GPU found")
+        print("         No GPU found")
     return sess2, boxes, scores, labels, input_data, classes, color_table
 
 
@@ -96,11 +90,13 @@ def obj_rec(input_image, sess2, boxes, scores, labels, input_data, classes, colo
     print(', '.join([classes[x] for x in labels_]))
     print('*' * 30)
     labels1 = ', '.join([classes[x] for x in labels_])
+    eti = [classes[x] for x in labels_]
 
+    # labels on the image
     for i in range(len(boxes_)):
         x0, y0, x1, y1 = boxes_[i]
         plot_one_box(img_ori, [x0, y0, x1, y1], label=classes[labels_[i]] + ', {:.2f}%'.format(scores_[i] * 100),
-                     color=color_table[labels_[i]])
+                     color=color_table[labels_[i]], line_thickness=4)
 
     # Inference time label on processed image
     label = 'Inference time: %.2f ms' % (inference_time)
@@ -113,4 +109,4 @@ def obj_rec(input_image, sess2, boxes, scores, labels, input_data, classes, colo
     print("Path to processed image: " + processed_img)
 
     scores_ = [round(elem, 2) for elem in scores_]
-    return processed_img, labels1, scores_
+    return processed_img, eti, scores_

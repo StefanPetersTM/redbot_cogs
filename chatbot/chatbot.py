@@ -1,28 +1,19 @@
-import os
-import tensorflow as tf
-import json
-import numpy as np
-
-from .data.discord import encoder
-from .data.discord import model
-from .data.discord import sample
-from .data.discord import chat as cht
-import discord
 import aiohttp
-import logging
-import re
+import discord
+import tensorflow as tf
 
 from redbot.core import commands, checks, Config
+from .data.discord import chat as cht
+
 
 class chat(commands.Cog):
-    """Chat with me by @me"""
+    """Chat with me"""
 
-    listener = getattr(commands.Cog, "listener", None)  # red 3.0 backwards compatibility support
+    listener = getattr(commands.Cog, "listener", None)
 
     if listener is None:  # thanks Sinbad
         def listener(name=None):
             return lambda x: x
-
 
     def __init__(self, bot):
         g1 = tf.Graph()
@@ -41,26 +32,19 @@ class chat(commands.Cog):
 
     @commands.command()
     async def chat(self, ctx, *, message):
-        """Talk with me by @me or with '[p]chat <message>'"""
+        """Talk with me by DM with me or with '[p]chat <message>'"""
 
         print("\n\n\n\nMessage:{}".format(str(message)))
         author = str(ctx.message.author).split("#")[0]
         channel = ctx.message.channel
-        #print("message content: {}\n".format(message))
-       #print("ctx.message content: {}\n".format(ctx.message))
 
         if ctx.author.id != self.bot.user.id:
-            #print("author id:{0} + bot id:{1}\n\n".format(ctx.author.id, self.bot.user.id))
-            #print("author = " + str(author))
-            #print("rec message = " + message)
-            #print("self.conv = " + str(self.conv))
             async with channel.typing():
                 if author in self.conv:
-                    #print("working")
                     current_conv = self.conv[author]
                     current_conv += "\n{0}: {1}".format(author, message)
-                    #print("Current conv with {}: ".format(author) + current_conv)
-                    reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context, current_conv, author, self.bot_name)
+                    reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context, current_conv,
+                                                        author, self.bot_name)
                     print("Conv with {}:\n".format(author) + conversation)
                     self.conv[author] = conversation
 
@@ -71,11 +55,10 @@ class chat(commands.Cog):
 {0}: I'm {0}
 {1}: so what can I do for you?
 {0}: {2}""".format(author, self.bot_name, message)
-                    reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context, self.conv[author], author, self.bot_name)
+                    reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context,
+                                                        self.conv[author], author, self.bot_name)
                     self.conv[author] = conversation
                     print("conv with {0}: {1}".format(author, conversation))
-                    #print("reply of bot" + str(reply))
-
                 await ctx.send(str(reply))
 
     @commands.command()
@@ -112,7 +95,6 @@ class chat(commands.Cog):
     @checks.is_owner()
     async def dm(self, ctx):
         """Toggles reply in DM"""
-        guild = ctx.message.guild
         if not await self.config.allow_dm():
             await self.config.allow_dm.set(True)
             await ctx.send("I will reply directly to DM's.")
@@ -140,6 +122,24 @@ class chat(commands.Cog):
             await self.config.guild(guild).channel.set(None)
             await ctx.send("Automatic replies turned off.")
 
+    async def rec_img(self, ctx, img_labels):
+        """
+        This should not be shown in the help section
+        """
+        author = str(ctx.author).split("#")[0]
+        message = "Take a look at this picture of {}".format(', '.join(img_labels))
+        if author in self.conv:
+            print("working")
+            current_conv = self.conv[author]
+            current_conv += "\n{0}: {1}".format(author, message)
+            reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context,
+                                                current_conv, author, self.bot_name)
+            print("Conv with {}:\n".format(author) + conversation)
+            self.conv[author] = conversation
+
+        else:
+            pass
+
     @listener()
     async def on_message(self, message):
         if message.author.id != self.bot.user.id:
@@ -149,19 +149,14 @@ class chat(commands.Cog):
             if not ctx.prefix:
                 author = str(message.author).split("#")[0]
                 guild = message.guild
-                #print(str(guild)+str(author)+str(channel)+str(msg))
                 if guild is None:
                     if await self.config.allow_dm():
-                        #ctx = await self.bot.get_context(message)
-                        #author = str(ctx.message.author).split("#")[0]
                         channel = ctx.message.channel
                         message = message.clean_content
                         async with channel.typing():
                             if author in self.conv:
-                                # print("working")
                                 current_conv = self.conv[author]
                                 current_conv += "\n{0}: {1}".format(author, message)
-                                # print("Current conv with {}: ".format(author) + current_conv)
                                 reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context,
                                                                     current_conv, author, self.bot_name)
                                 print("Conv with {}:\n".format(author) + conversation)
@@ -178,45 +173,13 @@ class chat(commands.Cog):
                                                                     self.conv[author], author, self.bot_name)
                                 self.conv[author] = conversation
                                 print("conv with {0}: {1}".format(author, conversation))
-                                # print("reply of bot" + str(reply))
                             await ctx.send(str(reply))
                     return
-                #to_strip = f"(?m)^(<@!?{guild.me.id}>)"
-                #is_mention = re.findall(to_strip, message.`content)
-                #if not is_mention and message.channel.id != await self.config.guild(guild).channel():
-                #   returnprocess
-
-#                 if await self.config.guild(guild).toggle():
-#                     async with message.channel.typing():
-#                         if author in self.conv:
-#                             # print("working")
-#                             current_conv = self.conv[author]
-#                             current_conv += "\n{0}: {1}".format(author, message.clean_content)
-#                             # print("Current conv with {}: ".format(author) + current_conv)
-#                             reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context,
-#                                                                 current_conv, author, self.bot_name)
-#                             print("Conv with {}:\n".format(author) + conversation)
-#                             self.conv[author] = conversation
-#
-#                         else:
-#                             print("no existing conv\n")
-#                             self.conv[author] = """{0}: hi. what's your name?
-# {1}: {1}. and you?
-# {0}: I'm {0}
-# {1}: so what can I do for you?
-# {0}: {2}""".format(author, self.bot_name, message.clean_content)
-#                             reply, conversation = cht.get_reply(self.enc, self.sess1, self.output, self.context,
-#                                                                 self.conv[author], author, self.bot_name)
-#                             self.conv[author] = conversation
-#                             print("conv with {0}: {1}".format(author, conversation))
-#                             # print("reply of bot" + str(reply))
-#                         await message.channel.send(str(reply))
 
             else:
                 return
 
     def cog_unload(self):
-#        self.sess1.close()
         self.bot.loop.create_task(self.session.close())
 
     __unload = cog_unload

@@ -1,7 +1,3 @@
-# coding=utf-8
-# for better understanding about yolov3 architecture, refer to this website (in Chinese):
-# https://blog.csdn.net/leviopku/article/details/82660381
-
 from __future__ import division, print_function
 
 import tensorflow as tf

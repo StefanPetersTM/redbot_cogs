@@ -1,0 +1,6 @@
+Red-DiscordBot
+tensorflow-gpu==1.14
+discord.py==1.2.4
+numpy
+aiohttp
+opencv-python

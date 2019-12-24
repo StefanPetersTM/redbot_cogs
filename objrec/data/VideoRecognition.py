@@ -1,12 +1,10 @@
-# coding: utf-8
-
 from __future__ import division, print_function
+import time
+import os
 
 import tensorflow as tf
 import numpy as np
 import cv2
-import time
-import os
 
 from .utils.misc_utils import parse_anchors, read_class_names
 from .utils.nms_utils import gpu_nms
