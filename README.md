@@ -9,8 +9,12 @@ This repo has been created as a highschool project, and as such any feedback is 
 - The second extension is called *objrec*. This extension can process images sent to the bot using [YOLOv3](https://github.com/wizyoung/YOLOv3_TensorFlow) . The bot then sends a reply containing any objects found in the image.
 
 ## Usage
-First start by creating an environment containing the requirements.txt using pip:
+First start by creating an environment using python 3.7, then the requirements.txt using pip:
 
 ```
 pip install -r /path/to/requirements.txt
 ``` 
+
+Then follow the instructions on how to get up and running with redbot.
+
+Then profit! You can now chat with redbot and send him images!
