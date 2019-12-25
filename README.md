@@ -17,4 +17,24 @@ pip install -r /path/to/requirements.txt
 
 Then follow the instructions on how to get up and running with redbot.
 
+Then copy this repo where the bot's cogs files are located.
+
+The last step requires you to download the model weights and place them in their respective folders:
+
+- objrec, first [file](https://1drv.ms/u/s!Annk_cU7Ejkpg06Hq-S6DXEoMawQ?e=Z17Dbr); second [file](https://1drv.ms/u/s!Annk_cU7Ejkpg0_cvAXOVBt5wQ-v?e=VeWulX)
+    
+    
+    Place these two files in:
+    ```
+    redbot_cogs\objrec\data\data\darknet_weights
+    ```
+
+- chatbot, [file](https://1drv.ms/u/s!Annk_cU7Ejkpg1BBRdQZTixrhAWP?e=adUeXi)
+
+
+    Place this file in:
+    ```
+    redbot_cogs\chatbot\data\774M
+    ```
+    
 Then profit! You can now chat with redbot and send him images!
