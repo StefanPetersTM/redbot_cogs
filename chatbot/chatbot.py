@@ -142,7 +142,11 @@ class chat(commands.Cog):
 
     @listener()
     async def on_message(self, message):
-        if message.author.id != self.bot.user.id:
+        if message.author.id == self.bot.user.id:
+            return
+        if message.content.startswith("I agree"):
+            return
+        else:
             ctx = await self.bot.get_context(message)
             print("message prefix:{}".format(ctx.prefix))
             print("author: {0}\nmessage content:{1}".format(str(message.author), message.content))

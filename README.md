@@ -6,10 +6,10 @@ This repo has been created as a highschool project, and as such any feedback is 
 
 - The first extension is called *chatbot*. This chatbot can simulate human-like conversation by using the [GPT-2](https://github.com/openai/gpt-2) model.
 
-- The second extension is called *objrec*. This extension can process images sent to the bot using [YOLOv3](https://github.com/wizyoung/YOLOv3_TensorFlow) . The bot then sends a reply containing any objects found in the image.
+- The second extension is called *objrec*. This extension can process images sent to the bot using [YOLOv3](https://pjreddie.com/media/files/papers/YOLOv3.pdf) . The bot then sends a reply containing any objects found in the image.
 
 ## Usage
-First start by creating an environment using python 3.7, then the requirements.txt using pip:
+First start by creating an environment using python 3.7, then installing the requirements.txt using pip:
 
 ```
 pip install -r /path/to/requirements.txt
@@ -37,4 +37,27 @@ The last step requires you to download the model weights and place them in their
     redbot_cogs\chatbot\data\774M
     ```
     
+    Don't forget to load the cogs using:
+    ```
+    [p]load chatbot and [p] load objrec
+    ```
+    
+### Alternate usage
+You can also directly do the setup from a running redbot:
+    
+- [p]pipinstall ALL_DEPENDENCIES FROM requirements.txt
+    
+- [p]repo add redbot_cogs https://github.com/StefanPetersTM/redbot_cogs master    
+    
+- [p]cog install redbot_cogs objrec
+    
+- [p]cog install redbot_cogs chatbot
+
+    
+    
 Then profit! You can now chat with redbot and send him images!
+
+# Acknowledgements
+The chatbot extension is build using as a base one of the Trusty-cogs called [cleverbot](https://github.com/TrustyJAID/Trusty-cogs/tree/master/cleverbot) 
+
+The objrec extension is based on wizyoung's [implementation](https://github.com/wizyoung/YOLOv3_TensorFlow) of YOLOv3 in tensorflow

@@ -1,0 +1,8 @@
+{
+    "author" : ["StefanPetersTM"],
+    "install_msg" : "Thanks for checking out my cogs!\nFor issues, bugs, or suggestions contact me @MeepMeep#7180 For the source code of the cogs, visit my github here: <https://github.com/StefanPetersTM/redbot_cogs>",
+    "name" : "redbot_cogs",
+    "short" : "Fun AI cogs by StefanPetersTM",
+    "description" : "This repo contains two cogs that use machine learning(AI), to:\nSimulate human writing(a chatbot)\nRecognize objects in images sent to the bot(image processing)",
+    "tags" : ["Fun", "AI", "Tensorflow", "Chatbot", "Image_processing"]
+}
