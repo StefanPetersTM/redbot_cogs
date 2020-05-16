@@ -58,6 +58,8 @@ You can also directly do the setup from a running redbot:
 Then profit! You can now chat with redbot and send him images!
 
 # Acknowledgements
+Thank you to Raphael Holzer for his guidance @rasql
+
 The chatbot extension is build using as a base one of the Trusty-cogs called [cleverbot](https://github.com/TrustyJAID/Trusty-cogs/tree/master/cleverbot) 
 
 The objrec extension is based on wizyoung's [implementation](https://github.com/wizyoung/YOLOv3_TensorFlow) of YOLOv3 in tensorflow
