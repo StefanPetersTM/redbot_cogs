@@ -1,6 +1,9 @@
 # redbot_cogs
 This repo contains 2 extensions(add-ons) for [*redbot*](https://github.com/Cog-Creators/Red-DiscordBot), a discord bot.
 
+# This repo does not use tensorflow 2 and as such is deprecated
+If you can help with the code migration feel free to @me
+
 ## Intro
 This repo has been created as a highschool project, and as such any feedback is welcome.
 
